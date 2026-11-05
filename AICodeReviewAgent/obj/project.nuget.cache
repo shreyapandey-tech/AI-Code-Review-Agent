@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "jUIO6WZ3T+k=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\suman\\OneDrive\\Desktop\\CodeAgent\\AICodeReviewAgent\\AICodeReviewAgent.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\suman\\.nuget\\packages\\system.text.json\\8.0.5\\system.text.json.8.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}

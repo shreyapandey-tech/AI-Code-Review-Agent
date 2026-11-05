@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Code Review Agent</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       Header
+  ═══════════════════════════════════════════ -->
+  <header class="app-header">
+    <div class="header-inner">
+      <span class="logo">🤖</span>
+      <div>
+        <h1>AI Code Review Agent</h1>
+        <p class="subtitle">Paste a Git diff or upload a patch file for instant AI-powered feedback</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ═══════════════════════════════════════════
+         Input panel
+    ═══════════════════════════════════════════ -->
+    <section class="card input-card">
+      <div class="card-header">
+        <h2>📋 Provide Your Diff</h2>
+        <div class="tab-group">
+          <button class="tab active" data-tab="paste">Paste Diff</button>
+          <button class="tab"        data-tab="upload">Upload File</button>
+        </div>
+      </div>
+
+      <!-- Paste tab -->
+      <div id="tab-paste" class="tab-pane active">
+        <div class="toolbar">
+          <button id="btn-load-sample" class="btn btn-secondary" title="Load a sample diff to test the agent">
+            📄 Load Sample Diff
+          </button>
+          <button id="btn-clear" class="btn btn-ghost">✕ Clear</button>
+        </div>
+        <textarea
+          id="diff-input"
+          class="diff-textarea"
+          placeholder="Paste your Git diff / patch here…"
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <!-- Upload tab -->
+      <div id="tab-upload" class="tab-pane hidden">
+        <label class="dropzone" id="dropzone">
+          <span class="drop-icon">📁</span>
+          <span class="drop-text">Drop a <strong>.patch</strong> or <strong>.diff</strong> file here</span>
+          <span class="drop-hint">or click to browse</span>
+          <input type="file" id="file-input" accept=".patch,.diff,.txt" hidden />
+        </label>
+        <p id="file-name" class="file-name-label"></p>
+      </div>
+
+      <!-- Optional repository context (shared across tabs) -->
+      <details class="context-details">
+        <summary>📂 Optional: Repository Context</summary>
+        <textarea
+          id="repo-context"
+          class="repo-textarea"
+          placeholder="Paste a directory listing or file tree here. The agent uses this to check whether test files exist."
+          rows="4"
+        ></textarea>
+      </details>
+
+      <div class="action-row">
+        <button id="btn-review" class="btn btn-primary">
+          🔍 Run Code Review
+        </button>
+        <span id="review-status" class="status-text"></span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         Results panel (hidden until review runs)
+    ═══════════════════════════════════════════ -->
+    <section id="results-section" class="card results-card hidden">
+
+      <!-- Summary bar -->
+      <div class="results-header">
+        <h2>📊 Review Results</h2>
+        <div id="summary-badges" class="badge-row"></div>
+      </div>
+      <p id="summary-text" class="summary-text"></p>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <span class="filter-label">Filter by:</span>
+        <div id="severity-filters" class="filter-group"></div>
+        <div id="category-filters" class="filter-group"></div>
+        <button id="btn-clear-filters" class="btn btn-ghost btn-sm">Reset</button>
+      </div>
+
+      <!-- Findings list -->
+      <div id="findings-list" class="findings-list"></div>
+
+      <!-- Empty state -->
+      <div id="no-findings" class="no-findings hidden">
+        <span class="no-findings-icon">✅</span>
+        <p>No issues found by the current filters.</p>
+      </div>
+
+      <!-- Footer meta -->
+      <div class="results-footer">
+        <span id="meta-tool-calls"></span>
+        <span id="meta-reviewed-at"></span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         Error banner (hidden by default)
+    ═══════════════════════════════════════════ -->
+    <div id="error-banner" class="error-banner hidden">
+      <span class="error-icon">⚠️</span>
+      <span id="error-message"></span>
+      <button id="btn-dismiss-error" class="btn btn-ghost btn-sm">Dismiss</button>
+    </div>
+
+  </main>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="spinner-box">
+      <div class="spinner"></div>
+      <p class="spinner-text">AI Agent is reviewing your code…</p>
+      <p class="spinner-sub">Parsing diff → Running tools → Generating insights</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+

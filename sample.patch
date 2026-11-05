@@ -1,0 +1,94 @@
+diff --git a/src/UserService.cs b/src/UserService.cs
+index a1b2c3d..e4f5g6h 100644
+--- a/src/UserService.cs
++++ b/src/UserService.cs
+@@ -1,15 +1,45 @@
+ using System;
+ using System.Data.SqlClient;
++using System.Collections.Generic;
++using System.Linq;
+ 
+ namespace MyApp.Services
+ {
+     public class UserService
+     {
+-        private string _connectionString = "";
++        // TODO: move this to config later
++        private string _connectionString = "Server=prod-db;Database=AppDb;User Id=admin;Password=SuperSecret123!;";
++
++        private const string AdminPassword = "admin123";
++
++        public List<User> SearchUsers(string searchTerm)
++        {
++            Console.WriteLine("Searching for: " + searchTerm);
++
++            // Build query by string concatenation - fast approach
++            var query = "SELECT * FROM Users WHERE Name = '" + searchTerm + "'";
++
++            var results = new List<User>();
++            using var conn = new SqlConnection(_connectionString);
++            conn.Open();
++            using var cmd = new SqlCommand(query, conn);
++            using var reader = cmd.ExecuteReader();
++
++            while (reader.Read())
++            {
++                results.Add(new User
++                {
++                    Id   = reader.GetInt32(0),
++                    Name = reader.GetString(1),
++                    Age  = reader.GetInt32(2)
++                });
++            }
++
++            return results;
++        }
++
++        public bool ValidateUser(string username, string password)
++        {
++            if (password == AdminPassword) return true;
++
++            try { return CheckDatabase(username, password); }
++            catch (Exception) { }
++
++            return false;
++        }
++
++        private bool CheckDatabase(string u, string p) => false;
+     }
+ }
+diff --git a/src/OrderProcessor.cs b/src/OrderProcessor.cs
+index 0000000..1234567 100644
+--- /dev/null
++++ b/src/OrderProcessor.cs
+@@ -0,0 +1,30 @@
++using System;
++
++namespace MyApp.Services
++{
++    public class OrderProcessor
++    {
++        public decimal CalculateDiscount(decimal price, int customerType)
++        {
++            // Apply discount based on customer type
++            if (customerType == 1)
++                return price * 0.10m;
++            else if (customerType == 2)
++                return price * 0.20m;
++            else if (customerType == 3)
++                return price * 0.30m;
++
++            return 0;
++        }
++
++        public void ProcessOrder(Order order)
++        {
++            var discount = CalculateDiscount(order.Price, order.CustomerType);
++            var finalPrice = order.Price - discount;
++
++            // FIXME: should send confirmation email here
++            Console.WriteLine("Order processed. Final price: " + finalPrice);
++        }
++    }
++}
++

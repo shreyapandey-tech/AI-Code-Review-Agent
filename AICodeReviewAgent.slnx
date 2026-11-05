@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="AICodeReviewAgent.Tests/AICodeReviewAgent.Tests.csproj" />
+  <Project Path="AICodeReviewAgent/AICodeReviewAgent.csproj" />
+</Solution>

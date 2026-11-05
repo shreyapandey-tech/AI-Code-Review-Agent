@@ -1,0 +1,17 @@
+@AICodeReviewAgent_HostAddress = http://localhost:5019
+
+### Get Sample Diff
+GET {{AICodeReviewAgent_HostAddress}}/api/review/sample
+Accept: application/json
+
+###
+
+### Submit Diff for Review
+POST {{AICodeReviewAgent_HostAddress}}/api/review
+Content-Type: application/json
+
+{
+  "diffContent": "diff --git a/Test.cs b/Test.cs\n--- a/Test.cs\n+++ b/Test.cs\n@@ -1,1 +1,2 @@\n+// TODO: check security\n+var pass = \"123456\";"
+}
+
+###
