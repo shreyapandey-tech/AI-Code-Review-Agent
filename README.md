@@ -21,8 +21,6 @@ This project allows developers to paste a Git diff or upload a `.patch` file. Th
 8. [Running Unit Tests](#running-unit-tests)
 9. [API Endpoints Reference](#api-endpoints-reference)
 10. [Sample Diff for Testing](#sample-diff-for-testing)
-11. [Design Decisions & Technical Challenges](#design-decisions--technical-challenges)
-12. [20-Minute Technical Interview Cheatsheet](#20-minute-technical-interview-cheatsheet)
 
 ---
 
@@ -292,45 +290,6 @@ The file `sample.patch` in the repository root contains an authentic patch alter
 3. **Code Quality**: Swallowed exceptions in `catch (Exception) {}` and `Console.WriteLine` left in production.
 4. **Style / Maintainability**: Magic numbers and `TODO`/`FIXME` markers.
 
-You can load this sample instantly by clicking **"📄 Load Sample Diff"** in the web UI.
+we can load this sample instantly by clicking **"📄 Load Sample Diff"** in the web UI.
 
 ---
-
-## 💡 Design Decisions & Technical Challenges
-
-1. **Why Plain C# Over Heavy AI Frameworks (Semantic Kernel / AutoGen)?**
-   - Eliminates framework lock-in and heavy dependencies.
-   - The entire tool-calling loop fits in ~100 lines of readable C#, making it easy to explain and debug.
-   - Ideal for developers who want to understand how agentic function calling works under the hood.
-
-2. **Why OpenAI-Compatible Schema for NVIDIA NIM?**
-   - NVIDIA NIM hosts high-performance open models (`Llama-3.1-70B`, `Mistral-Large`, etc.) through an OpenAI-compliant REST API.
-   - This allows switching between NVIDIA NIM, OpenAI, Groq, or local Ollama simply by changing `BaseUrl` and `ModelName` in `appsettings.json`.
-
-3. **Safe Execution Boundary:**
-   - The agent strictly parses diff text and runs regex heuristics. Code is **never executed or compiled dynamically**, eliminating remote code execution (RCE) vectors.
-
-4. **Handling Loop Divergence:**
-   - LLMs can occasionally enter repetitive tool-calling cycles. The `MaxToolCallIterations` parameter guarantees that after a set number of rounds, tool access is turned off (`tool_choice = "none"`), prompting the model for its final text synthesis.
-
----
-
-## 🎯 20-Minute Technical Interview Cheatsheet
-
-If presenting this project in a technical interview, use this 4-step walk-through:
-
-1. **System Motivation (2 mins)**
-   - Explain why automated PR review saves engineering hours and catches security flaws early.
-   - Emphasize why static tools alone aren't enough (lack semantic context) and raw LLMs aren't enough (hallucinate without tools).
-2. **Agent Architecture & Tool Calling (6 mins)**
-   - Walk through `AgentService.cs`:
-     - Show how tool definitions are declared using standard JSON schema in `BuildToolDefinitions()`.
-     - Point out the loop: receive assistant message -> inspect `finish_reason == "tool_calls"` -> execute C# tool in `ExecuteTool()` -> push tool result message back into conversation.
-3. **Core .NET Practices (6 mins)**
-   - Show `Program.cs` and explain dependency injection: typed `HttpClient` registered with `AddHttpClient<LlmService>()`, options binding with `IOptions<NvidiaAiSettings>`, and `PhysicalFileProvider` for static UI serving.
-   - Highlight the 36 unit tests in `AICodeReviewAgent.Tests` validating diff parsing and regex detection without needing external network calls.
-4. **Security & Guardrails (4 mins)**
-   - Explain how User Secrets prevent committing credentials.
-   - Point out why uploaded code is never executed.
-   - Show how confidence levels (`Confirmed` vs `Potential`) prevent alarmist false-positives.
-
